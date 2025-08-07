@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - include:
+      file: fournisseur.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: client.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: payement.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: facteur.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: dossier.yml
+      relativeToChangelogFile: true
