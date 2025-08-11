@@ -18,3 +18,7 @@ databaseChangeLog:
   - include:
       file: dossier.yml
       relativeToChangelogFile: true
+
+  - include:
+      file: notification.yml
+      relativeToChangelogFile: true
