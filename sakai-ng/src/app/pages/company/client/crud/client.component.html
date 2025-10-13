@@ -1,0 +1,126 @@
+<p-toolbar styleClass="mb-6">
+    <ng-template #start>
+        <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+        <p-button
+            label="Delete"
+            icon="pi pi-trash"
+            severity="secondary"
+            outlined
+            (onClick)="deleteSelectedClients()"
+            [disabled]="!selectedClients || !selectedClients.length"
+        />
+    </ng-template>
+
+    <ng-template #end>
+        <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="clients()"
+    [rows]="10"
+    [paginator]="true"
+    [(selection)]="selectedClients"
+    dataKey="id"
+    [rowHover]="true"
+    [globalFilterFields]="['name','email','phonenumber','adresse.city','adresse.country']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} clients"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Manage Clients</h5>
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+            </span>
+        </div>
+    </ng-template>
+
+    <ng-template #header>
+        <tr>
+            <th style="width: 3rem">
+                <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="name" style="min-width:16rem">
+                Name
+                <p-sortIcon field="name" />
+            </th>
+            <th pSortableColumn="email" style="min-width:20rem">
+                Email
+                <p-sortIcon field="email" />
+            </th>
+            <th pSortableColumn="phonenumber" style="min-width:12rem">
+                Phone
+                <p-sortIcon field="phonenumber" />
+            </th>
+            <th pSortableColumn="adresse.city" style="min-width:12rem">
+                City
+                <p-sortIcon field="adresse.city" />
+            </th>
+            <th pSortableColumn="adresse.country" style="min-width:12rem">
+                Country
+                <p-sortIcon field="adresse.country" />
+            </th>
+        </tr>
+    </ng-template>
+
+    <ng-template #body let-client>
+        <tr>
+            <td style="width: 3rem">
+                <p-tableCheckbox [value]="client" />
+            </td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.phonenumber }}</td>
+            <td>{{ client.adresse?.city }}</td>
+            <td>{{ client.adresse?.country }}</td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editClient(client)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteClient(client)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="clientDialog" [style]="{ width: '450px' }" header="Client Details" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-4">
+            <div>
+                <label for="name" class="block font-bold mb-2">Name</label>
+                <input type="text" pInputText id="name" [(ngModel)]="client.name" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !client.name">Name is required.</small>
+            </div>
+            <div>
+                <label for="email" class="block font-bold mb-2">Email</label>
+                <input type="email" pInputText id="email" [(ngModel)]="client.email" required fluid />
+            </div>
+            <div>
+                <label for="phone" class="block font-bold mb-2">Phone</label>
+                <input pInputMask id="phone" mask="(999) 999-9999" [(ngModel)]="client.phonenumber" />
+            </div>
+            <div>
+                <label for="street" class="block font-bold mb-2">Street</label>
+                <input type="text" pInputText id="street" [(ngModel)]="client.adresse!.street" fluid />
+            </div>
+            <div>
+                <label for="city" class="block font-bold mb-2">City</label>
+                <input type="text" pInputText id="city" [(ngModel)]="client.adresse!.city" fluid />
+            </div>
+            <div>
+                <label for="country" class="block font-bold mb-2">Country</label>
+                <input type="text" pInputText id="country" [(ngModel)]="client.adresse!.country" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Save" icon="pi pi-check" (click)="saveClient()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

@@ -1,0 +1,108 @@
+<p-toolbar styleClass="mb-6">
+  <ng-template #start>
+    <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+    <p-button
+      label="Delete"
+      icon="pi pi-trash"
+      severity="secondary"
+      outlined
+      (onClick)="deleteSelectedInvoices()"
+      [disabled]="!selectedInvoices || !selectedInvoices.length"
+    />
+  </ng-template>
+
+  <ng-template #end>
+    <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+  </ng-template>
+</p-toolbar>
+
+<p-table
+  #dt
+  [value]="invoices"
+  [rows]="10"
+  [paginator]="true"
+  [(selection)]="selectedInvoices"
+  dataKey="id"
+  [rowHover]="true"
+  [globalFilterFields]="['number','type','company.name']"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices"
+  [showCurrentPageReport]="true"
+  [rowsPerPageOptions]="[10, 20, 30]"
+>
+  <ng-template #caption>
+    <div class="flex items-center justify-between">
+      <h5 class="m-0">Manage Invoices</h5>
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+      </span>
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+      <th pSortableColumn="number">Numéro <p-sortIcon field="number" /></th>
+      <th pSortableColumn="date">Date <p-sortIcon field="date" /></th>
+      <th pSortableColumn="amount">Montant <p-sortIcon field="amount" /></th>
+      <th pSortableColumn="tva">TVA <p-sortIcon field="tva" /></th>
+      <th pSortableColumn="type">Type <p-sortIcon field="type" /></th>
+      <th style="min-width:10rem"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-invoice>
+    <tr>
+      <td style="width: 3rem"><p-tableCheckbox [value]="invoice" /></td>
+      <td>{{ invoice.number }}</td>
+      <td>{{ invoice.date | date: 'shortDate' }}</td>
+      <td>{{ invoice.amount | currency: 'EUR':'symbol' }}</td>
+      <td>{{ invoice.tva }}</td>
+      <td>{{ invoice.type }}</td>
+   
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- DIALOG FORM -->
+<p-dialog [(visible)]="invoiceDialog" [style]="{ width: '500px' }" header="Invoice Details" [modal]="true">
+  <ng-template #content>
+    <div class="flex flex-col gap-4">
+      <div>
+        <label for="number" class="block font-bold mb-2">Numéro</label>
+        <input type="text" pInputText id="number" [(ngModel)]="invoice.number" required placeholder="INV-001" />
+        <small class="text-red-500" *ngIf="submitted && !invoice.number">Numéro requis.</small>
+      </div>
+
+      <div>
+        <label for="date" class="block font-bold mb-2">Date</label>
+<input type="date" [(ngModel)]="invoice.date" class="form-control" />
+      </div>
+
+      <div>
+        <label for="amount" class="block font-bold mb-2">Montant</label>
+        <input type="number" pInputText id="amount" [(ngModel)]="invoice.amount" required />
+      </div>
+
+      <div>
+        <label for="tva" class="block font-bold mb-2">TVA</label>
+        <input type="number" pInputText id="tva" [(ngModel)]="invoice.tva" required />
+      </div>
+
+      <div>
+        <label for="type" class="block font-bold mb-2">Type</label>
+        <input type="text" pInputText id="type" [(ngModel)]="invoice.type" required placeholder="Ex: Vente" />
+      </div>
+
+
+    </div>
+  </ng-template>
+
+  <ng-template #footer>
+    <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+    <p-button label="Save" icon="pi pi-check" (click)="saveInvoice()" />
+  </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />
