@@ -1,28 +1,25 @@
 databaseChangeLog:
   - include:
-      file: manager.yml
+      file: audit-log.yml
       relativeToChangelogFile: true
   - include:
-      file: fournisseur.yml
+      file: languages.yml
       relativeToChangelogFile: true
   - include:
-      file: client.yml
+      file: timezones.yml
       relativeToChangelogFile: true
   - include:
-      file: payement.yml
+      file: currencies.yml
       relativeToChangelogFile: true
   - include:
-      file: facteur.yml
+      file: countries.yml
       relativeToChangelogFile: true
   - include:
-      file: dossier.yml
+      file: accounting_codes.yml
       relativeToChangelogFile: true
   - include:
-      file: notification.yml
+      file: accountants.yml
       relativeToChangelogFile: true
   - include:
-      file: dashbord.yml
-      relativeToChangelogFile: true
-  - include:
-      file: address.yml   
+      file: accountants_accounting_codes.yml
       relativeToChangelogFile: true

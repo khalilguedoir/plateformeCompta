@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-accountant-accounting-codes
+      author: khalil
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: accountant_accounting_codes
+            columns:
+              - column:
+                  name: accountant_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_accountant_codes_accountant
+                    references: public.comptables(id)
+
+              - column:
+                  name: accounting_code_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_accountant_codes_account
+                    references: public.accounting_codes(id)

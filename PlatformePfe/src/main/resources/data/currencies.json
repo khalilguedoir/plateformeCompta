@@ -1,0 +1,12 @@
+[
+  { "code": "USD", "name": "Dollar", "symbol": "$" },
+  { "code": "EUR", "name": "Euro", "symbol": "€" },
+  { "code": "GBP", "name": "Pound", "symbol": "£" },
+  { "code": "JPY", "name": "Yen", "symbol": "¥" },
+  { "code": "XOF", "name": "CFA Franc BCEAO", "symbol": "Fr" },
+  { "code": "XAF", "name": "CFA Franc BEAC", "symbol": "Fr" },
+  { "code": "ZAR", "name": "Rand", "symbol": "R" },
+  { "code": "TND", "name": "Tunisian Dinar", "symbol": "DT" },
+  { "code": "EGP", "name": "Egyptian Pound", "symbol": "E£" },
+  { "code": "MAD", "name": "Moroccan Dirham", "symbol": "Dh" }
+]

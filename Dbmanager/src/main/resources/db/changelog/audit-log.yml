@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: audit-log-v1
+      author: khalil
+      changes:
+        - createTable:
+            tableName: audit_log
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: entity_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: VARCHAR(255)
+              - column:
+                  name: action
+                  type: VARCHAR(50)   # INSERT / UPDATE / DELETE / APP_EVENT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: old_value
+                  type: TEXT           # (option: JSONB)
+              - column:
+                  name: new_value
+                  type: TEXT           # (option: JSONB)
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - createIndex:
+            tableName: audit_log
+            indexName: idx_audit_log_entity
+            columns:
+              - column:
+                  name: entity_name
+
+        - createIndex:
+            tableName: audit_log
+            indexName: idx_audit_log_created_at
+            columns:
+              - column:
+                  name: created_at
+
+        - createIndex:
+            tableName: audit_log
+            indexName: idx_audit_log_username
+            columns:
+              - column:
+                  name: username

@@ -45,16 +45,14 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/swagger-ui.html"
             ).permitAll()
-            // Autoriser les endpoints d'authentification
             .requestMatchers("/auth/**", "/api/*/auth/**").permitAll()
-            // Tout le reste est protégé
             .anyRequest().authenticated()
             .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterAfter(jwtFilter(), TenantFilter.class);
 
         return http.build();
     }

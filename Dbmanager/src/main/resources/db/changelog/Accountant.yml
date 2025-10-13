@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-accountant
+      author: khalil
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: Accountants
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+
+              - column:
+                  name: numero_agrement
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: specialite
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: user_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comptable_user
+                    references: public.users(id)

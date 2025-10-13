@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-manager-table
+      author: khalil
+      changes:
+        - createTable:
+            tableName: manager
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nom
+                  type:  VARCHAR(255)
+              - column:
+                  name: date_ouverture
+                  type: DATE

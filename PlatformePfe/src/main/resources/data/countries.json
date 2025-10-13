@@ -1,0 +1,14 @@
+[
+  { "iso2": "US", "iso3": "USA", "name": "United States", "phone_code": "1", "capital": "Washington", "region": "Americas", "subregion": "Northern America", "currency_code": "USD" },
+  { "iso2": "FR", "iso3": "FRA", "name": "France", "phone_code": "33", "capital": "Paris", "region": "Europe", "subregion": "Western Europe", "currency_code": "EUR" },
+  { "iso2": "TN", "iso3": "TUN", "name": "Tunisia", "phone_code": "216", "capital": "Tunis", "region": "Africa", "subregion": "Northern Africa", "currency_code": "TND" },
+  { "iso2": "DZ", "iso3": "DZA", "name": "Algeria", "phone_code": "213", "capital": "Algiers", "region": "Africa", "subregion": "Northern Africa", "currency_code": "DZD" },
+  { "iso2": "EG", "iso3": "EGY", "name": "Egypt", "phone_code": "20", "capital": "Cairo", "region": "Africa", "subregion": "Northern Africa", "currency_code": "EGP" },
+  { "iso2": "MA", "iso3": "MAR", "name": "Morocco", "phone_code": "212", "capital": "Rabat", "region": "Africa", "subregion": "Northern Africa", "currency_code": "MAD" },
+  { "iso2": "NG", "iso3": "NGA", "name": "Nigeria", "phone_code": "234", "capital": "Abuja", "region": "Africa", "subregion": "Western Africa", "currency_code": "NGN" },
+  { "iso2": "ZA", "iso3": "ZAF", "name": "South Africa", "phone_code": "27", "capital": "Pretoria", "region": "Africa", "subregion": "Southern Africa", "currency_code": "ZAR" },
+  { "iso2": "GH", "iso3": "GHA", "name": "Ghana", "phone_code": "233", "capital": "Accra", "region": "Africa", "subregion": "Western Africa", "currency_code": "GHS" },
+  { "iso2": "CI", "iso3": "CIV", "name": "Côte d'Ivoire", "phone_code": "225", "capital": "Yamoussoukro", "region": "Africa", "subregion": "Western Africa", "currency_code": "XOF" },
+  { "iso2": "SN", "iso3": "SEN", "name": "Senegal", "phone_code": "221", "capital": "Dakar", "region": "Africa", "subregion": "Western Africa", "currency_code": "XOF" },
+  { "iso2": "CM", "iso3": "CMR", "name": "Cameroon", "phone_code": "237", "capital": "Yaoundé", "region": "Africa", "subregion": "Central Africa", "currency_code": "XAF" }
+]

@@ -19,6 +19,10 @@ public class User {
     private String username;
 
     private String password;
+    
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean active = false;
+
 
     private Role role; // ADMIN, ACCOUNTANT, COMPANY
 

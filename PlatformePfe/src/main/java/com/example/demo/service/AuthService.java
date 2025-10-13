@@ -38,6 +38,7 @@ public class AuthService {
     @Autowired private CompanyRepository companyRepository;
     @Autowired private CustomUserDetailsService userDetailsService;
     @Autowired private UserRepository userRepository;
+    @Autowired private CompanyService companyService;
     @Autowired private TenantService tenantService;
     @Autowired private JwtService jwtService;
     @Autowired private DataSourceConfig dataSourceConfig;
@@ -58,15 +59,18 @@ public class AuthService {
 
         if (role == Role.COMPANY && request.getCompany() != null) {
             String companyName = request.getCompany().getName().toLowerCase();
+
             if (companyRepository.existsByName(companyName)) {
                 throw new RuntimeException("Company already exists: " + companyName);
             }
+
             company = new Company();
             company.setName(companyName);
-            company = companyRepository.save(company);
 
-            // Création du schema pour la société
+            company = companyService.save(company);
+
             tenantService.createSchemaIfNotExists(companyName);
+
             message = "Company created successfully with schema '" + companyName + "'";
         }
         else if (role == Role.ACCOUNTANT) {

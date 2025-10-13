@@ -2,9 +2,9 @@ package com.example.demo.service;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import liquibase.database.DatabaseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,50 @@ public class SchemaUpdateService {
     @Autowired
     private DataSource dataSource;
 
-    private static final String CHANGELOG_PATH = "db/changelog/master.yml";
+    private static final String PUBLIC_CHANGELOG = "db/changelog/public-changelog.yml";
+    private static final String SCHEMA_CHANGELOG = "db/changelog/master.yml";
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public SchemaUpdateService(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public void updatePublicSchema() {
+        executeLiquibase("public", PUBLIC_CHANGELOG, liquibase -> liquibase.update((String) null),
+                "✅ Migration public appliquée", "❌ Erreur migration public");
+        logMigration("public", PUBLIC_CHANGELOG, "UPDATE");
+    }
+
+    public void rollbackPublicCount(int count) {
+        executeLiquibase("public", PUBLIC_CHANGELOG, liquibase -> liquibase.rollback(count, null),
+                "✅ Rollback public effectué", "❌ Erreur rollback public");
+        logMigration("public", PUBLIC_CHANGELOG, "ROLLBACK_COUNT_" + count);
+    }
+
+    public void rollbackPublicToDate(String dateStr) {
+        executeLiquibaseToDate("public", PUBLIC_CHANGELOG, dateStr,
+                "✅ Rollback public appliqué", "❌ Erreur rollback public");
+        logMigration("public", PUBLIC_CHANGELOG, "ROLLBACK_TO_DATE_" + dateStr);
+    }
+
+    public void updateSchema(String schemaName) {
+        executeLiquibase(schemaName, SCHEMA_CHANGELOG, liquibase -> liquibase.update((String) null),
+                "✅ Migration appliquée", "❌ Erreur migration");
+        logMigration(schemaName, SCHEMA_CHANGELOG, "UPDATE");
+    }
 
     public void updateAllSchemas() {
         for (String schema : getAllSchemas()) {
             updateSchema(schema);
         }
+    }
+
+    public void rollbackCount(String schemaName, int count) {
+        executeLiquibase(schemaName, SCHEMA_CHANGELOG, liquibase -> liquibase.rollback(count, null),
+                "✅ Rollback de " + count + " changeSets effectué", "❌ Erreur rollback");
+        logMigration(schemaName, SCHEMA_CHANGELOG, "ROLLBACK_COUNT_" + count);
     }
 
     public void rollbackCountAllSchemas(int count) {
@@ -35,67 +73,70 @@ public class SchemaUpdateService {
         }
     }
 
-    public void rollbackToDateAllSchemas(String date) {
+    public void rollbackToDate(String schemaName, String dateStr) {
+        executeLiquibaseToDate(schemaName, SCHEMA_CHANGELOG, dateStr,
+                "✅ Rollback appliqué", "❌ Erreur rollback");
+        logMigration(schemaName, SCHEMA_CHANGELOG, "ROLLBACK_TO_DATE_" + dateStr);
+    }
+
+    public void rollbackToDateAllSchemas(String dateStr) {
         for (String schema : getAllSchemas()) {
-            rollbackToDate(schema, date);
+            rollbackToDate(schema, dateStr);
         }
     }
 
-    public void updateSchema(String schemaName) {
-        executeLiquibase(schemaName, liquibase -> liquibase.update((String) null),
-                "✅ Mise à jour appliquée", "❌ Erreur lors de la mise à jour");
-    }
-
-    public void rollbackCount(String schemaName, int count) {
-        executeLiquibase(schemaName, liquibase -> liquibase.rollback(count, null),
-                "✅ Rollback de " + count + " changeSet(s) effectué",
-                "❌ Erreur lors du rollbackCount");
-    }
-
-    public void rollbackToDate(String schema, String dateStr) {
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setSchema(schema);
-
-            Database database = DatabaseFactory.getInstance()
-                    .findCorrectDatabaseImplementation(new JdbcConnection(connection));
-
-            Liquibase liquibase = new Liquibase(CHANGELOG_PATH, new ClassLoaderResourceAccessor(), database);
-
-            Date dateCible = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-
-            liquibase.rollback(dateCible, null);
-
-            System.out.println("✅ Rollback appliqué au schéma : " + schema + " jusqu'à la date " + dateStr);
-        } catch (Exception e) {
-            System.err.println("❌ Erreur rollbackToDate sur le schéma " + schema + ": " + e.getMessage());
-        }
-    }
-
-
-    private void executeLiquibase(String schemaName, LiquibaseAction action, String successMsg, String errorMsg) {
+    private void executeLiquibase(String schemaName, String changelog, LiquibaseAction action,
+                                  String successMsg, String errorMsg) {
         try (Connection connection = dataSource.getConnection()) {
             connection.setSchema(schemaName);
-
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
-
-            Liquibase liquibase = new Liquibase(CHANGELOG_PATH, new ClassLoaderResourceAccessor(), database);
-
+            Liquibase liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(), database);
             action.run(liquibase);
-
             System.out.println(successMsg + " pour le schéma : " + schemaName);
         } catch (Exception e) {
             System.err.println(errorMsg + " sur " + schemaName + ": " + e.getMessage());
         }
     }
 
+    private void executeLiquibaseToDate(String schemaName, String changelog, String dateStr,
+                                        String successMsg, String errorMsg) {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setSchema(schemaName);
+            Database database = DatabaseFactory.getInstance()
+                    .findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            Liquibase liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(), database);
+            Date dateCible = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
+            liquibase.rollback(dateCible, null);
+            System.out.println(successMsg + " pour le schéma : " + schemaName + " jusqu'à la date " + dateStr);
+        } catch (Exception e) {
+            System.err.println(errorMsg + " sur " + schemaName + ": " + e.getMessage());
+        }
+    }
+
+    // -------------------- GET ALL SCHEMAS --------------------
     private List<String> getAllSchemas() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         return jdbcTemplate.queryForList(
                 "SELECT schema_name FROM information_schema.schemata " +
-                "WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'public', 'pg_toast')",
+                        "WHERE schema_name NOT IN ('information_schema','pg_catalog','public','pg_toast')",
                 String.class
         );
+    }
+
+    private void logMigration(String schemaName, String changelogPath, String action) {
+        try {
+            String sql = "INSERT INTO public.audit_log(entity_name, action, new_value, tenant_id, username) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+            jdbcTemplate.update(sql,
+                    "DATABASE_SCHEMA",
+                    action,
+                    "Migration appliquée depuis " + changelogPath,
+                    schemaName,
+                    "system"
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Erreur audit sur schema " + schemaName + ": " + e.getMessage());
+        }
     }
 
     @FunctionalInterface

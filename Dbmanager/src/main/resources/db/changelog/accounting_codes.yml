@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-accounting-codes
+      author: khalil
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: accounting_codes
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+
+              # Code du compte (ex : "1", "11", "111")
+              - column:
+                  name: codeCompte
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: label
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: parent_id
+                  type: INT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_account_parent
+                    references: public.accounting_codes(id)
+
+              - column:
+                  name: country_id
+                  type: INT
+                  constraints:
+                    foreignKeyName: fk_account_country
+                    references: public.countries(id)
