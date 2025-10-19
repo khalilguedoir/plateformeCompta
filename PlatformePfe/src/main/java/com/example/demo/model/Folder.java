@@ -28,7 +28,7 @@ public class Folder {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
 	    private Date dateGenerate;
-	    private String type;
+	    private TypeDossier type;
 	    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<Document> documents;
 	    
@@ -56,11 +56,11 @@ public class Folder {
 			this.dateGenerate = dateGenerate;
 		}
 
-		public String getType() {
+		public TypeDossier getType() {
 			return type;
 		}
 
-		public void setType(String type) {
+		public void setType(TypeDossier type) {
 			this.type = type;
 		}
 

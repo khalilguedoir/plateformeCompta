@@ -17,7 +17,10 @@ public class User {
     private Long id;
 
     private String username;
-
+    
+    @Column(unique = true, nullable = false)
+    private String email;
+    
     private String password;
     
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
@@ -70,6 +73,22 @@ public class User {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
     
     

@@ -23,7 +23,8 @@ public class Company {
 
     @Column(name = "matricule_fiscale", unique = true, nullable = false)
     private String matriculeFiscale;
-
+    @Column(unique = true, nullable = false)
+    private String email;
     @OneToOne
     @JoinColumn(name = "address_id", nullable = true)
     private Address address;
@@ -37,7 +38,15 @@ public class Company {
         return id;
     }
 
-    public void setId(Long id) {
+    public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setId(Long id) {
         this.id = id;
     }
 
