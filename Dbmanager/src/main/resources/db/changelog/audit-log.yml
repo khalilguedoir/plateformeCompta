@@ -1,12 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: audit-log-v1
+      id: create-audit-log-table
       author: khalil
       preConditions:
-        - onFail: MARK_RAN
-        - not:
-            tableExists:
-              tableName: audit_log
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: audit_log
       changes:
         - createTable:
             tableName: audit_log
@@ -17,6 +17,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
+                    nullable: false
               - column:
                   name: entity_name
                   type: VARCHAR(255)
@@ -27,15 +28,15 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   name: action
-                  type: VARCHAR(50)   # INSERT / UPDATE / DELETE / APP_EVENT
+                  type: VARCHAR(50)
                   constraints:
                     nullable: false
               - column:
                   name: old_value
-                  type: TEXT           # (option: JSONB)
+                  type: TEXT
               - column:
                   name: new_value
-                  type: TEXT           # (option: JSONB)
+                  type: TEXT
               - column:
                   name: username
                   type: VARCHAR(255)

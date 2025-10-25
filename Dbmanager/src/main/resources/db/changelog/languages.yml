@@ -4,12 +4,14 @@ databaseChangeLog:
       author: khalil
       preConditions:
         - onFail: MARK_RAN
+        - onError: MARK_RAN
         - not:
             tableExists:
               tableName: languages
       changes:
         - createTable:
             tableName: languages
+            schemaName: public
             columns:
               - column:
                   name: id
@@ -17,7 +19,16 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: language_name
+                  name: code
+                  type: VARCHAR(10)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
                   type: VARCHAR(100)
                   constraints:
                     nullable: false
+              - column:
+                  name: native_name
+                  type: VARCHAR(100)

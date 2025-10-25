@@ -4,13 +4,13 @@ databaseChangeLog:
       author: khalil
       preConditions:
         - onFail: MARK_RAN
+        - onError: MARK_RAN
         - not:
             tableExists:
               tableName: timezones
       changes:
         - createTable:
             tableName: timezones
-            schemaName: public
             columns:
               - column:
                   name: id
@@ -18,17 +18,16 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: tz_name
-                  type: VARCHAR(100)
+                  name: code
+                  type: VARCHAR(10)
                   constraints:
                     unique: true
                     nullable: false
               - column:
-                  name: utc_offset
-                  type: VARCHAR(10)
+                  name: name
+                  type: VARCHAR(100)
                   constraints:
                     nullable: false
               - column:
-                  name: is_dst
-                  type: BOOLEAN
-                  defaultValueBoolean: false
+                  name: utc_offset
+                  type: VARCHAR(10)
