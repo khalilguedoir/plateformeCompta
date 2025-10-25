@@ -17,16 +17,12 @@ databaseChangeLog:
 
   - include:
       file: dossier.yml
-      relativeToChangelogFile: true   # dossier avant reglepaiements
-
-  - include:
-      file: reglepaiements.yml
-      relativeToChangelogFile: true   # dépend de dossier
-
-  - include:
-      file: notification.yml
       relativeToChangelogFile: true
 
   - include:
-      file: dashbord.yml
+      file: reglepaiements.yml
+      relativeToChangelogFile: true 
+
+  - include:
+      file: notification.yml
       relativeToChangelogFile: true
