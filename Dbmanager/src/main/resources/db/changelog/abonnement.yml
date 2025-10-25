@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-abonnement-table
+      author: khalil
+      changes:
+        - createTable:
+            tableName: abonnements
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: date_debut
+                  type: DATE
+              - column:
+                  name: date_fin
+                  type: DATE
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+              - column:
+                  name: montant
+                  type: DECIMAL(10,2)
+              - column:
+                  name: statut_paiement
+                  type: VARCHAR(50)
+              - column:
+                  name: company_id
+                  type: INT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: abonnements
+            baseColumnNames: company_id
+            referencedTableName: company
+            referencedColumnNames: id
+            constraintName: fk_abonnement_company

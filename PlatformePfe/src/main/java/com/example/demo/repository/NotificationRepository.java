@@ -11,9 +11,7 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findByRecipientTypeOrderByCreatedAtDesc(String recipientType);
 
-    List<Notification> findByRecipientIdOrderByCreatedAtDesc(String recipientId);
     boolean existsByMessageAndCompany(String message, Company company);
 
 }

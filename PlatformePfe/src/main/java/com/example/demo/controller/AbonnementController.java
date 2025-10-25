@@ -22,11 +22,17 @@ public class AbonnementController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createAbonnement(@RequestBody AbonnementRequestDTO requestDTO) {
+        System.out.println("Received abonnement request: " + requestDTO);
+        if (requestDTO.getTimezoneId() == null) {
+            return ResponseEntity.badRequest().body("timezoneId is required");
+        }
         try {
             Abonnement abonnement = abonnementService.createAbonnementWithUser(requestDTO);
             return ResponseEntity.ok(abonnement);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }

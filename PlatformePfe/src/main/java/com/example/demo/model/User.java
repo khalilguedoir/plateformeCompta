@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
+@Table(name = "users", schema = "public")
 public class User {
 
     @Id
@@ -26,7 +26,7 @@ public class User {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean active = false;
 
-
+    @Enumerated(EnumType.STRING)
     private Role role; // ADMIN, ACCOUNTANT, COMPANY
 
     @ManyToOne

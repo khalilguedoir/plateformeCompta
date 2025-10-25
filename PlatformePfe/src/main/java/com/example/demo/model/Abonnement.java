@@ -9,7 +9,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "abonnements")
+@Table(name = "abonnements", schema = "public")
 public class Abonnement {
 
     @Id

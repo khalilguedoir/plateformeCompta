@@ -2,6 +2,11 @@ databaseChangeLog:
   - changeSet:
       id: audit-log-v1
       author: khalil
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: audit_log
       changes:
         - createTable:
             tableName: audit_log

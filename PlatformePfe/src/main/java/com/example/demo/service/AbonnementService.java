@@ -6,6 +6,7 @@ import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Random;
@@ -23,31 +24,68 @@ public class AbonnementService {
     private UserRepository userRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private TimezoneRepository timezoneRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private EmailService emailService;
 
-    // creation  abonnement && un utilisateur pour  la société
+    /**
+     * Crée une société, un abonnement et l'utilisateur principal avec adresse et timezone.
+     */
+    @Transactional
     public Abonnement createAbonnementWithUser(AbonnementRequestDTO dto) {
 
-        // creation  société
+        // 1️⃣ Créer la société
         Company company = new Company();
         company.setName(dto.getCompanyName());
         company.setMatriculeFiscale(dto.getMatriculeFiscale());
         company.setDatabaseName(dto.getCompanyName().toLowerCase().replaceAll(" ", "_"));
-        companyRepository.save(company);
+        company.setEmail(dto.getEmail());
 
-        // creation abonnement
+        // Récupérer la timezone
+        Timezone timezone = timezoneRepository.findById(dto.getTimezoneId())
+        		.orElseThrow(() -> new RuntimeException("Timezone introuvable"));
+        company.setTimezone(timezone);
+
+        companyRepository.save(company); // il faut d'abord sauvegarder pour avoir l'id
+
+        // 2️⃣ Créer l'adresse
+        Address address = new Address();
+        address.setCity(dto.getAddress());
+        address.setStreet(""); // si tu veux un champ street dans DTO
+        address.setEntityName("Company");
+        address.setEntityId(company.getId());
+
+        // On prend un pays par défaut (ex: Tunisia)
+        Country country = countryRepository.findById(1L) // par défaut Tunisia
+                .orElseThrow(() -> new RuntimeException("Country introuvable"));
+        address.setCountry(country);
+
+        addressRepository.save(address);
+        company.setAddress(address); // relier l'adresse à la société
+
+        companyRepository.save(company); // mettre à jour company avec address
+
+        // 3️⃣ Créer l'abonnement
         Abonnement abonnement = new Abonnement();
         abonnement.setCompany(company);
         abonnement.setType(TypeAbonnement.valueOf(dto.getTypeAbonnement()));
         abonnement.setMontant(dto.getMontant());
         abonnement.setStatutPaiement(StatutPaiement.EN_ATTENTE);
         abonnement.setDateDebut(new Date());
+
         abonnementRepository.save(abonnement);
 
-        //  creation l'utilisateur principal societe
+        // 4️⃣ Créer l'utilisateur principal
         String rawPassword = generateRandomPassword(8);
         User user = new User();
         user.setUsername(company.getName());
@@ -55,10 +93,10 @@ public class AbonnementService {
         user.setPassword(passwordEncoder.encode(rawPassword));
         user.setRole(Role.COMPANY);
         user.setCompany(company);
-        user.setActive(false); // désactivé  validation par admin
+        user.setActive(false); // désactivé jusqu'à validation admin
         userRepository.save(user);
 
-        //  email  confirmation
+        // 5️⃣ Envoyer email
         String subject = "Votre compte a été créé - Abonnement en attente de validation";
         String body = "Bonjour,\n\nVotre compte a été créé avec succès.\n\n" +
                 "Nom d'utilisateur : " + user.getUsername() + "\n" +

@@ -1,28 +1,28 @@
 databaseChangeLog:
   - include:
+      file: address.yml
+      relativeToChangelogFile: true
+  - include:
       file: manager.yml
       relativeToChangelogFile: true
   - include:
-      file: fournisseur.yml
+      file: dossier.yml       # <-- déplacer avant reglepaiements
+      relativeToChangelogFile: true
+  - include:
+      file: suppliers.yml
       relativeToChangelogFile: true
   - include:
       file: client.yml
       relativeToChangelogFile: true
   - include:
-      file: payement.yml
+      file: reglepaiements.yml
       relativeToChangelogFile: true
   - include:
       file: facteur.yml
-      relativeToChangelogFile: true
-  - include:
-      file: dossier.yml
       relativeToChangelogFile: true
   - include:
       file: notification.yml
       relativeToChangelogFile: true
   - include:
       file: dashbord.yml
-      relativeToChangelogFile: true
-  - include:
-      file: address.yml   
       relativeToChangelogFile: true

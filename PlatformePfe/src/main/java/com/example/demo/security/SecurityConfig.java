@@ -45,14 +45,14 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/swagger-ui.html"
             ).permitAll()
-            .requestMatchers("/auth/**", "/api/*/auth/**").permitAll()
+            .requestMatchers("/auth/**", "/api/*/auth/**","/api/abonnements/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(jwtFilter(), TenantFilter.class);
+            .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

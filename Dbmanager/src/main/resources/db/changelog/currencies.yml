@@ -1,32 +1,36 @@
-databaseChangeLog:
-  - changeSet:
-      id: create-currencies-table
-      author: khalil
-      changes:
-        - createTable:
-            tableName: currencies
-            schemaName: public
-            columns:
-              - column:
-                  name: id
-                  type: SERIAL
-                  constraints:
-                    primaryKey: true
-              - column:
-                  name: code
-                  type: VARCHAR(3)
-                  constraints:
-                    unique: true
-                    nullable: false
-              - column:
-                  name: symbol
-                  type: VARCHAR(10)
-              - column:
-                  name: name
-                  type: VARCHAR(100)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: decimal_digits
-                  type: INT
-                  defaultValueNumeric: 2
+- changeSet:
+     id: create-currencies-table
+     author: khalil
+     preConditions:
+       - onFail: MARK_RAN
+       - not:
+           tableExists:
+             tableName: currencies
+     changes:
+       - createTable:
+           tableName: currencies
+           schemaName: public
+           columns:
+             - column:
+                 name: id
+                 type: SERIAL
+                 constraints:
+                   primaryKey: true
+             - column:
+                 name: code
+                 type: VARCHAR(3)
+                 constraints:
+                   unique: true
+                   nullable: false
+             - column:
+                 name: symbol
+                 type: VARCHAR(10)
+             - column:
+                 name: name
+                 type: VARCHAR(100)
+                 constraints:
+                   nullable: false
+             - column:
+                 name: decimal_digits
+                 type: INT
+                 defaultValueNumeric: 2

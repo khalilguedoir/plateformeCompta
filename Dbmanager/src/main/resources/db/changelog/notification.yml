@@ -1,21 +1,43 @@
-databaseChangeLog:
-  - changeSet:
-      id: create-notification-table
-      author: khalil
-      changes:
-        - createTable:
-            tableName: notification
-            columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: description
-                  type:  VARCHAR(255)
-              - column:
-                  name: date_creation
-                  type: DATE
+- changeSet:
+    id: create-notification-table
+    author: khalil
+    preConditions:
+      - onFail: MARK_RAN
+      - not:
+          tableExists:
+            tableName: notifications
+    changes:
+      - createTable:
+          tableName: notifications
+          schemaName: public
+          columns:
+            - column:
+                name: id
+                type: SERIAL
+                constraints:
+                  primaryKey: true
+            - column:
+                name: title
+                type: VARCHAR(255)
+            - column:
+                name: message
+                type: TEXT
+            - column:
+                name: type
+                type: VARCHAR(100)
+            - column:
+                name: seen
+                type: BOOLEAN
+                defaultValueBoolean: false
+            - column:
+                name: created_at
+                type: TIMESTAMP
+            - column:
+                name: company_id
+                type: INT
+      - addForeignKeyConstraint:
+          baseTableName: notifications
+          baseColumnNames: company_id
+          referencedTableName: company
+          referencedColumnNames: id
+          constraintName: fk_notification_company

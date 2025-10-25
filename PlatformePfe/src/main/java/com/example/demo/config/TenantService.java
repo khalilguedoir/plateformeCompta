@@ -3,13 +3,14 @@ package com.example.demo.config;
 import com.example.demo.model.Company;
 import com.example.demo.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 @Service
 public class TenantService {
@@ -20,37 +21,39 @@ public class TenantService {
     @Autowired
     private DataSourceConfig dsConfig;
 
-
+    /**
+     * Crée un schéma vide pour le tenant si celui-ci n'existe pas
+     */
     public void createSchemaIfNotExists(String schemaName) {
-        String sqlScript = """
-            CREATE SCHEMA IF NOT EXISTS %s;
-            SET search_path TO %s;
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(100) NOT NULL,
-                password TEXT NOT NULL,
-                role VARCHAR(50) NOT NULL
-            );
-        """.formatted(schemaName, schemaName);
+        String sql = "CREATE SCHEMA IF NOT EXISTS \"" + schemaName + "\"";
+        try (Connection conn = dsConfig.adminDataSource().getConnection();
+             Statement stmt = conn.createStatement()) {
 
-        DataSource dataSource = dsConfig.createDataSource("admin_db");
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute(sqlScript);
+            stmt.execute(sql);
+            System.out.println("✅ Schéma créé avec succès : " + schemaName);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("❌ Erreur lors de la création du schéma : " + schemaName, e);
+        }
     }
-    
-    
+
+    /**
+     * Crée le tenant pour la société : 
+     * - Crée le schéma vide
+     * - Met à jour le nom de la base dans l'entité Company
+     */
     @Transactional
     public Company createTenantForCompany(Company company) {
         String schema = company.getName().toLowerCase().replace(" ", "_");
 
-        JdbcTemplate jdbc = new JdbcTemplate(dsConfig.adminDataSource());
-        jdbc.execute("CREATE SCHEMA IF NOT EXISTS \"" + schema + "\"");
+        // 1️⃣ Création du schéma vide
+        createSchemaIfNotExists(schema);
 
-        DataSource companyDataSource = dsConfig.createDataSource(schema);
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("schema.sql"));
-        populator.execute(companyDataSource);
-
+        // 2️⃣ Enregistrement du nom du schéma dans la société
         company.setDatabaseName(schema);
-        return companyRepo.save(company);
+        Company savedCompany = companyRepo.save(company);
+
+        System.out.println("✅ Tenant créé pour la société : " + company.getName() + " -> " + schema);
+        return savedCompany;
     }
 }

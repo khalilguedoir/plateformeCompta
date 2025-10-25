@@ -12,26 +12,32 @@ import java.io.IOException;
 @Component
 public class TenantFilter extends OncePerRequestFilter {
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-	                                HttpServletResponse response,
-	                                FilterChain filterChain)
-	        throws ServletException, IOException {
+    private static final String DEFAULT_TENANT = "public"; // ou "admin_db" si tu veux travailler sur ce nom
 
-	    System.out.println("=== FILTER START ===");
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-	    String tenantId = request.getHeader("X-Tenant-ID");
-	    System.out.println("=== TENANT ID HEADER === " + tenantId);
+        System.out.println("=== FILTER START ===");
 
-	    if (tenantId != null && !tenantId.isEmpty()) {
-	        TenantContext.setCurrentTenant(tenantId);
-	    }
+        String tenantId = request.getHeader("X-Tenant-ID");
+        System.out.println("=== TENANT ID HEADER === " + tenantId);
 
-	    try {
-	        filterChain.doFilter(request, response);
-	    } finally {
-	        TenantContext.clear();
-	    }
-	}
+        if (tenantId == null || tenantId.isBlank()) {
+            // Set a default tenant instead of leaving it null
+            tenantId = DEFAULT_TENANT;
+            System.out.println("=== TENANT ID not provided. Using default: " + DEFAULT_TENANT);
+        }
 
+        TenantContext.setCurrentTenant(tenantId);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            TenantContext.clear();
+            System.out.println("=== FILTER END ===");
+        }
+    }
 }

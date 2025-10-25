@@ -18,8 +18,14 @@ databaseChangeLog:
       file: accounting_codes.yml
       relativeToChangelogFile: true
   - include:
-      file: accountants.yml
+      file: accountant.yml
       relativeToChangelogFile: true
   - include:
       file: accountants_accounting_codes.yml
+      relativeToChangelogFile: true
+  - include:
+      file: abonnement.yml
+      relativeToChangelogFile: true
+  - include:
+      file: notification.yml
       relativeToChangelogFile: true

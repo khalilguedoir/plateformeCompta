@@ -1,7 +1,11 @@
-databaseChangeLog:
-  - changeSet:
+- changeSet:
       id: create-accountant-accounting-codes
       author: khalil
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: accountant_accounting_codes
       changes:
         - createTable:
             schemaName: public
@@ -13,8 +17,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_accountant_codes_accountant
-                    references: public.comptables(id)
-
+                    references: public.accountants(id)
               - column:
                   name: accounting_code_id
                   type: INT

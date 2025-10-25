@@ -1,7 +1,11 @@
-databaseChangeLog:
-  - changeSet:
+- changeSet:
       id: create-countries-table
       author: khalil
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: countries
       changes:
         - createTable:
             tableName: countries

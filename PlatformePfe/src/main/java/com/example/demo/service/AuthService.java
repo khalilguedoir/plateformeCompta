@@ -46,35 +46,29 @@ public class AuthService {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
-
     public AuthResponse register(RegisterRequest request) {
         String username = request.getUsername();
+        String email = request.getEmail();
+        String password = request.getPassword();
         Role role = request.getRole();
-        Company company = null;
-        String message;
 
+        // Vérifier si le username existe déjà
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Username already exists: " + username);
         }
 
-        if (role == Role.COMPANY && request.getCompany() != null) {
-            String companyName = request.getCompany().getName().toLowerCase();
-
-            if (companyRepository.existsByName(companyName)) {
-                throw new RuntimeException("Company already exists: " + companyName);
-            }
-
-            company = new Company();
-            company.setName(companyName);
-
-            company = companyService.save(company);
-
-            tenantService.createSchemaIfNotExists(companyName);
-
-            message = "Company created successfully with schema '" + companyName + "'";
+        // Vérifier si le rôle est valide
+        if (role != Role.ADMIN && role != Role.ACCOUNTANT) {
+            throw new RuntimeException("Only ADMIN or ACCOUNTANT roles are allowed.");
         }
-        else if (role == Role.ACCOUNTANT) {
+
+        Company company = null;
+        String message;
+
+        if (role == Role.ACCOUNTANT) {
+            // Le comptable doit être rattaché à une company existante via le tenant header
             String tenant = TenantContext.getCurrentTenant();
+
             if (tenant == null || tenant.isEmpty()) {
                 throw new RuntimeException("Tenant header (X-Tenant-ID) is required for accountant registration");
             }
@@ -83,41 +77,50 @@ public class AuthService {
                     .orElseThrow(() -> new RuntimeException("Company not found for tenant: " + tenant));
 
             message = "Accountant created successfully in schema '" + tenant + "'";
-        }
-        else if (role == Role.ADMIN) {
-            message = "Admin user created successfully";
         } else {
-            throw new RuntimeException("Invalid role or missing company information");
+            // Admin global (super admin)
+            message = "Admin user created successfully";
         }
 
+        // Création de l’utilisateur
         User user = new User();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(email); // ✅ correction du problème email null
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole(role);
+        user.setActive(true);
         user.setCompany(company);
+
         user = userRepository.save(user);
 
-        if (company != null) {
+        // Si c’est un comptable, il faut aussi l’ajouter dans le schema de l’entreprise
+        if (role == Role.ACCOUNTANT && company != null) {
             DataSource tenantDataSource = dataSourceConfig.createDataSource(company.getName());
             JdbcTemplate jdbcTemplate = new JdbcTemplate(tenantDataSource);
 
             jdbcTemplate.update(
-                "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-                user.getUsername(),
-                user.getPassword(),
-                role.ordinal()
+                    "INSERT INTO users (username, email, password, role, active) VALUES (?, ?, ?, ?, ?)",
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    role.ordinal(),
+                    true
             );
         }
 
-        String tenantName = company != null ? company.getName() : null;
+        // Génération du JWT
+        String tenantName = (company != null) ? company.getName() : "admin_db";
         String token = jwtService.generateToken(
-            userDetailsService.loadUserByUsername(username),
-            tenantName
+                userDetailsService.loadUserByUsername(username),
+                tenantName
         );
 
         return new AuthResponse(token, message);
     }
 
+
+    
+    
     public AuthResponse login(AuthRequest request, HttpServletRequest httpRequest) {
         String tenant = request.getTenant();
         if (tenant == null || tenant.isEmpty()) {

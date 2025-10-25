@@ -8,6 +8,7 @@ import lombok.Data;
 public class RegisterRequest {
     private String username;
     private String password;
+    private String email;
     private Role role;
     private CompanyDto company;
 	public String getUsername() {
@@ -33,6 +34,12 @@ public class RegisterRequest {
 	}
 	public void setCompany(CompanyDto company) {
 		this.company = company;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
     
 }

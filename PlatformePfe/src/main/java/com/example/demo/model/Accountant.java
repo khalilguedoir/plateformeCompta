@@ -4,7 +4,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "Accountant", schema = "public")
+@Table(name = "Accountant")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

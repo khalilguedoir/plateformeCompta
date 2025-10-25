@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "addresses", schema = "public")
+@Table(name = "address")
 public class Address {
 
     @Id

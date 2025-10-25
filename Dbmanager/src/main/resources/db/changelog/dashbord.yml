@@ -1,21 +1,26 @@
-databaseChangeLog:
-  - changeSet:
-      id: create-dashbord-table
-      author: khalil
-      changes:
-        - createTable:
-            tableName: dashbord
-            columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: nom
-                  type:  VARCHAR(255)
-              - column:
-                  name: date_ouverture
-                  type: DATE
+- changeSet:
+     id: create-dashbord-table
+     author: khalil
+     preConditions:
+       - onFail: MARK_RAN
+       - not:
+           tableExists:
+             tableName: dashbord
+     changes:
+       - createTable:
+           tableName: dashbord
+           schemaName: public
+           columns:
+             - column:
+                 name: id
+                 type: BIGINT
+                 autoIncrement: true
+                 constraints:
+                   primaryKey: true
+                   nullable: false
+             - column:
+                 name: nom
+                 type: VARCHAR(255)
+             - column:
+                 name: date_ouverture
+                 type: DATE

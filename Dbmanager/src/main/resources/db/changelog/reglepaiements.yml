@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-reglepaiement-table
+      author: khalil
+      changes:
+        - createTable:
+            tableName: reglepaiements
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: montant
+                  type: DECIMAL(10,2)
+              - column:
+                  name: date
+                  type: DATE
+              - column:
+                  name: type
+                  type: VARCHAR(100)
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+              - column:
+                  name: folder_id
+                  type: INT
+              - column:
+                  name: company_id
+                  type: INT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: reglepaiements
+            baseColumnNames: folder_id
+            referencedTableName: dossier
+            referencedColumnNames: id
+            constraintName: fk_reglepaiement_dossier
+        - addForeignKeyConstraint:
+            baseTableName: reglepaiements
+            baseColumnNames: company_id
+            referencedTableName: company
+            referencedColumnNames: id
+            constraintName: fk_reglepaiement_company
